@@ -24,7 +24,7 @@ export const createUser = async (
     `INSERT INTO usuarios (username, email, password_hash, rol)
      VALUES ($1, $2, $3, $4)
      RETURNING id_usuario, username, email, rol`,
-    [data.nombre, data.email, data.password_hash, data.rol],
+    [data.username, data.email, data.password_hash, data.rol],
   );
   return result.rows[0];
 };
