@@ -1,5 +1,6 @@
 import {
   getAllMascotas,
+  getMascotasByPropietario,
   getMascotaById,
   createMascota,
   updateMascota,
@@ -7,7 +8,16 @@ import {
 } from "./mascotas.repository";
 import { CreateMascotaInput, UpdateMascotaInput } from "./mascotas.schema";
 
-export const getAllMascotasService = async () => {
+export const getAllMascotasService = async (
+  rol: string,
+  id_propietario?: number,
+) => {
+  console.log(rol);
+  console.log(id_propietario);
+
+  if (rol === "USUARIO" && id_propietario) {
+    return await getMascotasByPropietario(id_propietario);
+  }
   return await getAllMascotas();
 };
 
@@ -17,7 +27,15 @@ export const getMascotaByIdService = async (id: number) => {
   return mascota;
 };
 
-export const createMascotaService = async (data: CreateMascotaInput) => {
+export const createMascotaService = async (
+  data: CreateMascotaInput,
+  rol: string,
+  id_propietario?: number,
+) => {
+  // Si es USUARIO forzamos su id_propietario
+  if (rol === "USUARIO" && id_propietario) {
+    data.id_propietario = id_propietario;
+  }
   return await createMascota(data);
 };
 

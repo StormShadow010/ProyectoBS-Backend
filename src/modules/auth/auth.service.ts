@@ -18,9 +18,14 @@ export const loginService = async (data: LoginInput) => {
   if (!passwordValida) {
     throw new Error("Credenciales inválidas");
   }
-
+  console.log("Usuario encontrado:", user);
   const token = jwt.sign(
-    { id: user.id_usuario, username: user.username, rol: user.rol },
+    {
+      id: user.id_usuario,
+      username: user.username,
+      rol: user.rol,
+      id_propietario: user.id_propietario,
+    },
     process.env.JWT_SECRET!,
     { expiresIn: "8h" },
   );
@@ -32,11 +37,14 @@ export const loginService = async (data: LoginInput) => {
       username: user.username,
       email: user.email,
       rol: user.rol,
+      id_propietario: user.id_propietario,
     },
   };
 };
 
 export const registerService = async (data: RegisterInput) => {
+  console.log("DATA RECIBIDA:", data); // agregar esto
+
   const existe = await findUserByUsername(data.username);
 
   if (existe) {
@@ -44,7 +52,6 @@ export const registerService = async (data: RegisterInput) => {
   }
 
   const password_hash = await bcrypt.hash(data.password, 10);
-
   const user = await createUser({ ...data, password_hash });
 
   return user;

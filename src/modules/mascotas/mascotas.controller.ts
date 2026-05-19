@@ -10,7 +10,9 @@ import { ok, created, fail, serverError } from "../../utils/response";
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const mascotas = await getAllMascotasService();
+    const user = (req as any).user;
+    console.log(user);
+    const mascotas = await getAllMascotasService(user.rol, user.id_propietario);
     return ok(res, mascotas);
   } catch (err) {
     return serverError(res, err);
@@ -30,7 +32,12 @@ export const getById = async (req: Request, res: Response) => {
 
 export const create = async (req: Request, res: Response) => {
   try {
-    const mascota = await createMascotaService(req.body);
+    const user = (req as any).user;
+    const mascota = await createMascotaService(
+      req.body,
+      user.rol,
+      user.id_propietario,
+    );
     return created(res, mascota, "Mascota creada exitosamente");
   } catch (err) {
     if (err instanceof Error) return fail(res, err.message, 400);

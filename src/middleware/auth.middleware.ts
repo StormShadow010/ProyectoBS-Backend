@@ -18,6 +18,7 @@ export const authenticate = (
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    console.log("Pay:", payload);
     (req as any).user = payload;
     next();
   } catch {

@@ -11,15 +11,44 @@ export const getAllMascotas = async () => {
       m.peso_kg,
       m.color,
       m.activa,
+      m.id_especie,
+      m.id_propietario,
       e.nombre AS especie,
       p.nombres || ' ' || p.apellidos AS propietario,
-      p.telefono AS telefono_propietario,
-      p.id_propietario
+      p.telefono AS telefono_propietario
     FROM mascotas m
     INNER JOIN especies e ON m.id_especie = e.id_especie
     INNER JOIN propietarios p ON m.id_propietario = p.id_propietario
     ORDER BY m.id_mascota
   `);
+  return result.rows;
+};
+
+export const getMascotasByPropietario = async (id_propietario: number) => {
+  const result = await pool.query(
+    `
+    SELECT 
+      m.id_mascota,
+      m.nombre,
+      m.raza,
+      m.sexo,
+      m.fecha_nac,
+      m.peso_kg,
+      m.color,
+      m.activa,
+      m.id_especie,
+      m.id_propietario,
+      e.nombre AS especie,
+      p.nombres || ' ' || p.apellidos AS propietario,
+      p.telefono AS telefono_propietario
+    FROM mascotas m
+    INNER JOIN especies e ON m.id_especie = e.id_especie
+    INNER JOIN propietarios p ON m.id_propietario = p.id_propietario
+    WHERE m.id_propietario = $1
+    ORDER BY m.id_mascota
+  `,
+    [id_propietario],
+  );
   return result.rows;
 };
 

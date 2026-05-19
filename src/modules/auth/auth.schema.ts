@@ -7,11 +7,12 @@ export const loginSchema = z.object({
 
 export const registerSchema = z.object({
   username: z.string().min(3, "Usuario muy corto"),
-  email: z.email("Email inválido").optional(),
+  email: z.string().email("Email inválido").optional(),
   password: z.string().min(6, "Mínimo 6 caracteres"),
-  rol: z
-    .enum(["SUPERADMIN", "ADMIN", "USUARIO", "CONSULTA"])
-    .default("USUARIO"),
+  nombres: z.string().min(1, "El nombre es requerido"),
+  apellidos: z.string().min(1, "Los apellidos son requeridos"),
+  telefono: z.string().optional(),
+  ciudad: z.string().optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
