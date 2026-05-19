@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./db/pool";
 import authRoutes from "./modules/auth/auth.routes";
+import mascotasRoutes from "./modules/mascotas/mascotas.routes";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Rutas
 app.use("/api/auth", authRoutes);
+app.use("/api/mascotas", mascotasRoutes);
 
 // Health check
 app.get("/", async (req, res) => {
