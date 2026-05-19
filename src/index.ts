@@ -4,6 +4,8 @@ import cors from "cors";
 import pool from "./db/pool";
 import authRoutes from "./modules/auth/auth.routes";
 import mascotasRoutes from "./modules/mascotas/mascotas.routes";
+import especiesRoutes from "./modules/especies/especies.routes";
+import propietariosRoutes from "./modules/propietarios/propietarios.routes";
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 // Rutas
 app.use("/api/auth", authRoutes);
 app.use("/api/mascotas", mascotasRoutes);
+app.use("/api/especies", especiesRoutes);
+app.use("/api/propietarios", propietariosRoutes);
 
 // Health check
 app.get("/", async (req, res) => {
