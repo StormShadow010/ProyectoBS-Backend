@@ -6,13 +6,35 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  username: z.string().min(3, "Usuario muy corto"),
-  email: z.string().email("Email inválido").optional(),
+  username: z
+    .string({ message: "El usuario es obligatorio" })
+    .min(3, "Usuario muy corto")
+    .trim(),
+
+  // Modificado: Obligatorio, limpio y con estructura estricta
+  email: z
+    .string({ message: "El correo es obligatorio" })
+    .email("Por favor, ingresa un correo electrónico válido")
+    .trim(),
+
   password: z.string().min(6, "Mínimo 6 caracteres"),
-  nombres: z.string().min(1, "El nombre es requerido"),
-  apellidos: z.string().min(1, "Los apellidos son requeridos"),
-  telefono: z.string().optional(),
-  ciudad: z.string().optional(),
+
+  // Nuevo Campo: Cédula colombiana obligatoria de 7 a 10 números
+  cedula: z
+    .string({ message: "La cédula de ciudadanía es obligatoria" })
+    .regex(
+      /^\d{7,10}$/,
+      "La cédula debe ser un número válido entre 7 y 10 dígitos",
+    )
+    .trim(),
+
+  nombres: z.string().min(1, "El nombre es requerido").trim(),
+  apellidos: z.string().min(1, "Los apellidos son requeridos").trim(),
+  telefono: z
+    .string()
+    .regex(/^\d+$/, "El teléfono solo debe contener números")
+    .optional(),
+  ciudad: z.string().min(1, "La ciudad es requerida").trim(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

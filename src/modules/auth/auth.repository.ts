@@ -20,18 +20,27 @@ export const findUserById = async (id: number) => {
 export const createUser = async (
   data: RegisterInput & { password_hash: string },
 ) => {
-  // Usar transacción para crear propietario y usuario juntos
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    // 1 — Crear propietario
+    // 1. Validación de seguridad extra: Evitar duplicidad de cédula en la BD
+    const checkCedula = await client.query(
+      "SELECT id_propietario FROM propietarios WHERE cedula = $1",
+      [data.cedula],
+    );
+
+    if (checkCedula.rows.length > 0) {
+      throw new Error("La cédula de ciudadanía ya se encuentra registrada");
+    }
+
+    // 2 — Crear propietario usando la cédula colombiana real enviada por el input
     const propietarioRes = await client.query(
       `INSERT INTO propietarios (cedula, nombres, apellidos, telefono, ciudad)
-   VALUES ($1, $2, $3, $4, $5)
-   RETURNING id_propietario`,
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id_propietario`,
       [
-        `USR-${Date.now()}`, // cédula temporal única
+        data.cedula, // <-- Reemplazado el timestamp por la cédula real
         data.nombres,
         data.apellidos,
         data.telefono || null,
@@ -40,7 +49,7 @@ export const createUser = async (
     );
     const id_propietario = propietarioRes.rows[0].id_propietario;
 
-    // 2 — Crear usuario vinculado al propietario
+    // 3 — Crear usuario vinculado al propietario correspondiente
     const usuarioRes = await client.query(
       `INSERT INTO usuarios (username, email, password_hash, rol, id_propietario)
        VALUES ($1, $2, $3, 'USUARIO', $4)
