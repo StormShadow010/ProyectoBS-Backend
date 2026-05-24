@@ -1,23 +1,37 @@
 import { Response } from "express";
-import { ApiResponse } from "../types";
 
-export const ok = <T>(res: Response, data: T, message?: string) => {
-  const body: ApiResponse<T> = { success: true, data, message };
-  return res.status(200).json(body);
+export const ok = (
+  res: Response,
+  data: any = null,
+  message = "Operación exitosa",
+  status = 200,
+) => {
+  return res.status(status).json({
+    success: true,
+    message,
+    data,
+  });
 };
 
-export const created = <T>(res: Response, data: T, message?: string) => {
-  const body: ApiResponse<T> = { success: true, data, message };
-  return res.status(201).json(body);
+export const fail = (
+  res: Response,
+  message = "Error",
+  status = 400,
+  error: any = null,
+) => {
+  return res.status(status).json({
+    success: false,
+    message,
+    error,
+  });
 };
 
-export const fail = (res: Response, message: string, status = 400) => {
-  const body: ApiResponse<null> = { success: false, error: message };
-  return res.status(status).json(body);
-};
+export const serverError = (res: Response, error: any) => {
+  console.error(error);
 
-export const serverError = (res: Response, err: unknown) => {
-  const message = err instanceof Error ? err.message : "Error interno";
-  const body: ApiResponse<null> = { success: false, error: message };
-  return res.status(500).json(body);
+  return res.status(500).json({
+    success: false,
+    message: "Error interno del servidor",
+    error: process.env.NODE_ENV === "development" ? error.message : undefined,
+  });
 };

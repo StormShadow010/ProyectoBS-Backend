@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 import { findUserByUsername, createUser } from "./auth.repository";
+
 import { LoginInput, RegisterInput } from "./auth.schema";
+
+import { JwtPayload } from "../../types";
 
 export const loginService = async (data: LoginInput) => {
   const user = await findUserByUsername(data.username);
@@ -18,22 +22,22 @@ export const loginService = async (data: LoginInput) => {
   if (!passwordValida) {
     throw new Error("Credenciales inválidas");
   }
-  console.log("Usuario encontrado:", user);
-  const token = jwt.sign(
-    {
-      id: user.id_usuario,
-      username: user.username,
-      rol: user.rol,
-      id_propietario: user.id_propietario,
-    },
-    process.env.JWT_SECRET!,
-    { expiresIn: "8h" },
-  );
+
+  const payload: JwtPayload = {
+    id_usuario: user.id_usuario,
+    username: user.username,
+    rol: user.rol,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET!, {
+    expiresIn: "8h",
+  });
 
   return {
     token,
+
     user: {
-      id: user.id_usuario,
+      id_usuario: user.id_usuario,
       username: user.username,
       email: user.email,
       rol: user.rol,
@@ -43,8 +47,6 @@ export const loginService = async (data: LoginInput) => {
 };
 
 export const registerService = async (data: RegisterInput) => {
-  console.log("DATA RECIBIDA:", data); // agregar esto
-
   const existe = await findUserByUsername(data.username);
 
   if (existe) {
@@ -52,7 +54,16 @@ export const registerService = async (data: RegisterInput) => {
   }
 
   const password_hash = await bcrypt.hash(data.password, 10);
-  const user = await createUser({ ...data, password_hash });
 
-  return user;
+  const user = await createUser({
+    ...data,
+    password_hash,
+  });
+
+  return {
+    id_usuario: user.id_usuario,
+    username: user.username,
+    email: user.email,
+    rol: user.rol,
+  };
 };

@@ -18,8 +18,9 @@ export const authenticate = (
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    console.log("Pay:", payload);
-    (req as any).user = payload;
+
+    req.user = payload;
+
     next();
   } catch {
     return fail(res, "Token inválido o expirado", 401);
@@ -28,7 +29,11 @@ export const authenticate = (
 
 export const authorize = (...roles: Rol[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user as JwtPayload;
+    const user = req.user;
+
+    if (!user) {
+      return fail(res, "Usuario no autenticado", 401);
+    }
 
     if (!roles.includes(user.rol)) {
       return fail(res, "No tienes permisos para esta acción", 403);
