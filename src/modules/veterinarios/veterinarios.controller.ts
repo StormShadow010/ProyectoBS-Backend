@@ -5,7 +5,6 @@ import {
   updateVeterinarioSchema,
 } from "./veterinarios.schema";
 import { ok, created, fail, serverError } from "../../utils/response";
-import bcrypt from "bcryptjs";
 
 export const getAll = async (_req: Request, res: Response) => {
   try {
@@ -28,21 +27,13 @@ export const getById = async (req: Request, res: Response) => {
 export const create = async (req: Request, res: Response) => {
   try {
     const data = createVeterinarioSchema.parse(req.body);
-
-    // Credenciales auto-generadas: username = cédula, password = cédula hasheada
-    const username = data.cedula;
-    const password_hash = await bcrypt.hash(data.cedula, 10);
-
-    const nuevoVet = await svc.create({ ...data, username, password_hash });
+    const nuevoVet = await svc.create(data);
     return created(res, nuevoVet, "Veterinario creado con éxito");
   } catch (e: any) {
-    if (e?.errors) {
+    if (e?.errors)
       return fail(res, e.errors[0]?.message || "Datos inválidos", 400);
-    }
-    // Error de cédula/email duplicado (unique constraint de PostgreSQL)
-    if (e?.code === "23505") {
+    if (e?.code === "23505")
       return fail(res, "Ya existe un veterinario con esa cédula o email", 409);
-    }
     return serverError(res, e);
   }
 };
@@ -54,9 +45,8 @@ export const update = async (req: Request, res: Response) => {
     if (!updated) return fail(res, "No encontrado", 404);
     return ok(res, updated);
   } catch (e: any) {
-    if (e?.errors) {
+    if (e?.errors)
       return fail(res, e.errors[0]?.message || "Datos inválidos", 400);
-    }
     return serverError(res, e);
   }
 };

@@ -1,8 +1,5 @@
 import pool from "../../db/pool";
-import {
-  CreateVeterinarioInput,
-  UpdateVeterinarioInput,
-} from "./veterinarios.schema";
+import { UpdateVeterinarioInput } from "./veterinarios.schema";
 
 export const getAllVeterinarios = async () => {
   const { rows } = await pool.query(
@@ -19,13 +16,11 @@ export const getVeterinarioById = async (id: number) => {
   return rows[0] || null;
 };
 
-export const createVeterinario = async (
-  data: CreateVeterinarioInput & { username: string; password_hash: string },
-) => {
+export const createVeterinario = async (data: any) => {
   const { rows } = await pool.query(
     `INSERT INTO veterinarios
-      (cedula, nombres, apellidos, email, telefono, id_especialidad, activo, username, password_hash)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (cedula, nombres, apellidos, email, telefono, id_especialidad, activo)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
     [
       data.cedula,
@@ -35,8 +30,6 @@ export const createVeterinario = async (
       data.telefono ?? "",
       data.id_especialidad ?? null,
       data.activo ?? true,
-      data.username,
-      data.password_hash,
     ],
   );
   return rows[0];

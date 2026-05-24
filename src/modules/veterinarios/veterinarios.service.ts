@@ -8,9 +8,8 @@ export const getAll = () => repo.getAllVeterinarios();
 
 export const getById = (id: number) => repo.getVeterinarioById(id);
 
-export const create = (
-  data: CreateVeterinarioInput & { username: string; password_hash: string },
-) => repo.createVeterinario(data);
+export const create = (data: CreateVeterinarioInput) =>
+  repo.createVeterinario(data);
 
 export const update = (id: number, data: UpdateVeterinarioInput) =>
   repo.updateVeterinario(id, data);
