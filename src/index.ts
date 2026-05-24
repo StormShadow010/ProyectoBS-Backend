@@ -16,8 +16,8 @@ import tratamientosRoutes from "./modules/tratamientos/tratamientos.routes";
 import medicamentosRoutes from "./modules/medicamentos/medicamentos.routes";
 import facturasRoutes from "./modules/facturas/facturas.routes";
 import sqlRoutes from "./modules/sql/sql.routes";
-
 import { errorHandler } from "./middleware/error.middleware";
+import especialidadesRoutes from "./modules/especialidades/especialidades.routes";
 
 dotenv.config();
 
@@ -64,6 +64,7 @@ app.use(`${API}/tratamientos`, tratamientosRoutes);
 app.use(`${API}/medicamentos`, medicamentosRoutes);
 app.use(`${API}/facturas`, facturasRoutes);
 app.use(`${API}/sql`, sqlRoutes);
+app.use(`${API}/especialidades`, especialidadesRoutes);
 
 app.use((_req, res) => {
   return res.status(404).json({
