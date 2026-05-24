@@ -13,12 +13,9 @@ export const veterinarioSchema = z.object({
   activo: z.boolean().optional(),
 });
 
-export const createVeterinarioSchema = veterinarioSchema.extend({
-  username: z.string().min(3, "Usuario muy corto"),
-  password: z.string().min(6, "La contraseña debe tener mínimo 6 caracteres"),
-});
-
+export const createVeterinarioSchema = veterinarioSchema;
 export const updateVeterinarioSchema = veterinarioSchema.partial();
 
+// ¡ESTO ES LO QUE FALTABA!
 export type CreateVeterinarioInput = z.infer<typeof createVeterinarioSchema>;
 export type UpdateVeterinarioInput = z.infer<typeof updateVeterinarioSchema>;

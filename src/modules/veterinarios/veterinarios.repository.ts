@@ -1,5 +1,5 @@
 import pool from "../../db/pool";
-import { UpdateVeterinarioInput } from "./veterinarios.schema";
+import { UpdateVeterinarioInput } from "./veterinarios.schema"; // Importación correcta
 
 export const getAllVeterinarios = async () => {
   const { rows } = await pool.query(
@@ -51,8 +51,10 @@ export const updateVeterinario = async (
 ) => {
   const entries = Object.entries(data).filter(([_, v]) => v !== undefined);
   if (entries.length === 0) return await getVeterinarioById(id);
+
   const fields = entries.map(([k], i) => `${k} = $${i + 2}`).join(", ");
   const values = entries.map(([_, v]) => v);
+
   const { rows } = await pool.query(
     `UPDATE veterinarios SET ${fields} WHERE id_veterinario = $1 RETURNING *`,
     [id, ...values],

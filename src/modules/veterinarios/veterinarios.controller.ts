@@ -28,17 +28,19 @@ export const getById = async (req: Request, res: Response) => {
 export const create = async (req: Request, res: Response) => {
   try {
     const data = createVeterinarioSchema.parse(req.body);
-    const { username, password, ...vetData } = data;
-    const password_hash = await bcrypt.hash(password, 10);
-    return created(
-      res,
-      await svc.create({ ...vetData, username, password_hash }),
-    );
+
+    // Generación automática de credenciales
+    const username = data.cedula;
+    const password_hash = await bcrypt.hash(data.cedula, 10);
+
+    // Enviamos el objeto con las credenciales auto-generadas
+    const nuevoVet = await svc.create({ ...data, username, password_hash });
+    return created(res, nuevoVet, "Creado con éxito");
   } catch (e: any) {
-    return fail(res, e.errors?.[0]?.message || "Error");
+    // Si falla, el error te dirá exactamente qué campo falta o está mal
+    return fail(res, e.errors?.[0]?.message || "Error al crear");
   }
 };
-
 export const update = async (req: Request, res: Response) => {
   try {
     const data = updateVeterinarioSchema.parse(req.body);

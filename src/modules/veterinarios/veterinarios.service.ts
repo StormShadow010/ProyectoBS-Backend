@@ -1,5 +1,8 @@
 import * as repo from "./veterinarios.repository";
-import { UpdateVeterinarioInput } from "./veterinarios.schema";
+import {
+  CreateVeterinarioInput,
+  UpdateVeterinarioInput,
+} from "./veterinarios.schema";
 
 export const getAll = () => repo.getAllVeterinarios();
 export const getById = (id: number) => repo.getVeterinarioById(id);
