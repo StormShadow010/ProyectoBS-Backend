@@ -14,8 +14,8 @@ router.get("/:id", ctrl.getById);
 // POST
 router.post("/", authorize("SUPERADMIN", "ADMIN"), ctrl.create);
 
-// PUT
-router.put("/:id", authorize("SUPERADMIN", "ADMIN"), ctrl.update);
+// PATCH
+router.patch("/:id", authorize("SUPERADMIN", "ADMIN"), ctrl.update);
 
 // DELETE
 router.delete("/:id", authorize("SUPERADMIN"), ctrl.remove);
