@@ -4,23 +4,22 @@ import { authenticate, authorize } from "../../middleware/auth.middleware";
 
 const router = Router();
 
-// Todas las rutas requieren que el usuario esté autenticado
+// Todas las rutas requieren autenticación
 router.use(authenticate);
 
-// Listar todos los veterinarios
+// GET /api/v1/veterinarios — listar todos
 router.get("/", ctrl.getAll);
 
-// Obtener un veterinario específico por su ID
+// GET /api/v1/veterinarios/:id — obtener uno por ID
 router.get("/:id", ctrl.getById);
 
-// Crear un nuevo veterinario (Solo SuperAdmin y Admin pueden)
+// POST /api/v1/veterinarios — crear (solo SUPERADMIN y ADMIN)
 router.post("/", authorize("SUPERADMIN", "ADMIN"), ctrl.create);
 
-// Actualizar datos (Usamos PATCH para coincidir con tu frontend)
-// Solo SuperAdmin y Admin pueden realizar actualizaciones
+// PATCH /api/v1/veterinarios/:id — actualizar parcialmente (solo SUPERADMIN y ADMIN)
 router.patch("/:id", authorize("SUPERADMIN", "ADMIN"), ctrl.update);
 
-// Eliminar/Inactivar (Solo el SuperAdmin puede realizar esta acción)
+// DELETE /api/v1/veterinarios/:id — soft delete / inactivar (solo SUPERADMIN)
 router.delete("/:id", authorize("SUPERADMIN"), ctrl.remove);
 
 export default router;

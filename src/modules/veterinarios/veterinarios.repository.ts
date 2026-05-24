@@ -1,5 +1,8 @@
 import pool from "../../db/pool";
-import { UpdateVeterinarioInput } from "./veterinarios.schema"; // Importación correcta
+import {
+  CreateVeterinarioInput,
+  UpdateVeterinarioInput,
+} from "./veterinarios.schema";
 
 export const getAllVeterinarios = async () => {
   const { rows } = await pool.query(
@@ -16,55 +19,55 @@ export const getVeterinarioById = async (id: number) => {
   return rows[0] || null;
 };
 
-export const createVeterinario = async (data: any) => {
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const v = await client.query(
-      "INSERT INTO veterinarios (cedula, nombres, apellidos, telefono, email, id_especialidad) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [
-        data.cedula,
-        data.nombres,
-        data.apellidos,
-        data.telefono,
-        data.email,
-        data.id_especialidad,
-      ],
-    );
-    await client.query(
-      "INSERT INTO usuarios (username, password_hash, rol) VALUES ($1, $2, 'VETERINARIO')",
-      [data.username, data.password_hash],
-    );
-    await client.query("COMMIT");
-    return v.rows[0];
-  } catch (e) {
-    await client.query("ROLLBACK");
-    throw e;
-  } finally {
-    client.release();
-  }
+export const createVeterinario = async (
+  data: CreateVeterinarioInput & { username: string; password_hash: string },
+) => {
+  const { rows } = await pool.query(
+    `INSERT INTO veterinarios
+      (cedula, nombres, apellidos, email, telefono, id_especialidad, activo, username, password_hash)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     RETURNING *`,
+    [
+      data.cedula,
+      data.nombres,
+      data.apellidos,
+      data.email,
+      data.telefono ?? "",
+      data.id_especialidad ?? null,
+      data.activo ?? true,
+      data.username,
+      data.password_hash,
+    ],
+  );
+  return rows[0];
 };
 
 export const updateVeterinario = async (
   id: number,
   data: UpdateVeterinarioInput,
 ) => {
-  const entries = Object.entries(data).filter(([_, v]) => v !== undefined);
-  if (entries.length === 0) return await getVeterinarioById(id);
+  const fields = Object.keys(data) as (keyof UpdateVeterinarioInput)[];
+  if (fields.length === 0) return getVeterinarioById(id);
 
-  const fields = entries.map(([k], i) => `${k} = $${i + 2}`).join(", ");
-  const values = entries.map(([_, v]) => v);
+  const setClause = fields.map((key, i) => `${key} = $${i + 1}`).join(", ");
+  const values = fields.map((key) => data[key]);
 
   const { rows } = await pool.query(
-    `UPDATE veterinarios SET ${fields} WHERE id_veterinario = $1 RETURNING *`,
-    [id, ...values],
+    `UPDATE veterinarios
+     SET ${setClause}
+     WHERE id_veterinario = $${fields.length + 1}
+     RETURNING *`,
+    [...values, id],
   );
   return rows[0] || null;
 };
 
 export const deleteVeterinario = async (id: number) => {
   const { rows } = await pool.query(
-    "UPDATE veterinarios SET activo = FALSE WHERE id_veterinario = $1 RETURNING *",
+    `UPDATE veterinarios
+     SET activo = false
+     WHERE id_veterinario = $1
+     RETURNING *`,
     [id],
   );
   return rows[0] || null;
